@@ -1,0 +1,5 @@
+{
+  "name": "Foodcourt POS & Menu Manager",
+  "description": "A high-performance React POS system for foodcourts with Google Sheets integration for menu and order management.",
+  "requestFramePermissions": []
+}
