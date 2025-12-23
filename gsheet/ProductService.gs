@@ -28,9 +28,21 @@ const ProductService = {
     if (product.imageBlob && product.imageFileName) {
       try {
         const folder = Utils.getOrCreateFolder(DRIVE_FOLDER_NAME);
+
+        // Determine mime type from filename
+        const ext = product.imageFileName.split(".").pop().toLowerCase();
+        const mimeTypes = {
+          png: "image/png",
+          jpg: "image/jpeg",
+          jpeg: "image/jpeg",
+          gif: "image/gif",
+          webp: "image/webp",
+        };
+        const mimeType = mimeTypes[ext] || "image/png";
+
         const blob = Utilities.newBlob(
           Utilities.base64Decode(product.imageBlob),
-          "image/png",
+          mimeType,
           product.imageFileName
         );
         const file = folder.createFile(blob);
@@ -38,7 +50,9 @@ const ProductService = {
           DriveApp.Access.ANYONE_WITH_LINK,
           DriveApp.Permission.VIEW
         );
-        imageUrl = "https://drive.google.com/uc?export=view&id=" + file.getId();
+        // Use lh3 format for better browser compatibility
+        imageUrl =
+          "https://lh3.googleusercontent.com/d/" + file.getId() + "=s800";
       } catch (err) {
         Logger.log("Image upload error: " + err.toString());
       }
@@ -48,6 +62,14 @@ const ProductService = {
     const productId =
       product.id || "SKU-" + Math.floor(Math.random() * 90000 + 10000);
 
+    // Determine stokType from product type
+    let stokType = product.stokType || "STOK_FISIK";
+    if (product.productType === "nonstock") {
+      stokType = "NON_STOK";
+    } else if (product.productType === "service") {
+      stokType = "SERVICE";
+    }
+
     // Append new row
     sheet.appendRow([
       productId,
@@ -55,7 +77,7 @@ const ProductService = {
       product.category,
       product.price,
       product.stock || 0,
-      product.stokType || "NON_STOK",
+      stokType,
       product.available ? "TRUE" : "FALSE",
       imageUrl,
     ]);

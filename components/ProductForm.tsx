@@ -37,10 +37,10 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, onCancel, isLoading }
       reader.onloadend = () => {
         const base64String = (reader.result as string).split(',')[1];
         setImagePreview(reader.result as string);
-        setFormData(prev => ({ 
-          ...prev, 
+        setFormData(prev => ({
+          ...prev,
           imageBlob: base64String,
-          imageFileName: file.name 
+          imageFileName: file.name
         }));
       };
       reader.readAsDataURL(file);
@@ -49,7 +49,11 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, onCancel, isLoading }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    // Include productType in the submitted data
+    onSave({
+      ...formData,
+      stokType: productType === 'physical' ? 'STOK_FISIK' : productType === 'nonstock' ? 'NON_STOK' : 'SERVICE'
+    });
   };
 
   const categoryOptions = [
@@ -61,7 +65,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, onCancel, isLoading }
 
   // Toggle Switch Component
   const ToggleSwitch = ({ enabled, onChange }: { enabled: boolean; onChange: () => void }) => (
-    <button 
+    <button
       type="button"
       onClick={onChange}
       className={`w-12 h-6 rounded-full p-0.5 ${theme.transition} ${enabled ? 'bg-emerald-500' : 'bg-slate-200'}`}
@@ -104,14 +108,14 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, onCancel, isLoading }
           {/* Product Image */}
           <div className={`${styles.card} p-6`}>
             <h4 className="font-bold text-slate-800 mb-4">Product Image</h4>
-            <div 
+            <div
               className={`border-2 border-dashed border-slate-200 ${theme.radius.xl} p-8 flex flex-col items-center justify-center min-h-[200px] relative overflow-hidden hover:border-emerald-400 ${theme.transition} cursor-pointer`}
               onClick={() => fileInputRef.current?.click()}
             >
               {imagePreview ? (
                 <>
                   <img src={imagePreview} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
-                  <button 
+                  <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); setImagePreview(null); }}
                     className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full shadow-lg z-10"
@@ -129,10 +133,10 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, onCancel, isLoading }
                 </div>
               )}
             </div>
-            <input 
+            <input
               ref={fileInputRef}
-              type="file" 
-              className="hidden" 
+              type="file"
+              className="hidden"
               accept="image/*"
               onChange={handleFileChange}
             />
@@ -144,9 +148,9 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, onCancel, isLoading }
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-slate-600">Available</span>
-                <ToggleSwitch 
-                  enabled={formData.available} 
-                  onChange={() => setFormData(p => ({...p, available: !p.available}))} 
+                <ToggleSwitch
+                  enabled={formData.available}
+                  onChange={() => setFormData(p => ({...p, available: !p.available}))}
                 />
               </div>
               <div className="flex items-center justify-between">
@@ -160,20 +164,20 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, onCancel, isLoading }
           <div className={`${styles.card} p-6`}>
             <h4 className="font-bold text-slate-800 mb-4">Product Type</h4>
             <div className="space-y-1">
-              <RadioOption 
-                label="Physical Stock" 
-                checked={productType === 'physical'} 
-                onChange={() => setProductType('physical')} 
+              <RadioOption
+                label="Physical Stock"
+                checked={productType === 'physical'}
+                onChange={() => setProductType('physical')}
               />
-              <RadioOption 
-                label="Non-Stock Item" 
-                checked={productType === 'nonstock'} 
-                onChange={() => setProductType('nonstock')} 
+              <RadioOption
+                label="Non-Stock Item"
+                checked={productType === 'nonstock'}
+                onChange={() => setProductType('nonstock')}
               />
-              <RadioOption 
-                label="Service" 
-                checked={productType === 'service'} 
-                onChange={() => setProductType('service')} 
+              <RadioOption
+                label="Service"
+                checked={productType === 'service'}
+                onChange={() => setProductType('service')}
               />
             </div>
           </div>
@@ -198,9 +202,9 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, onCancel, isLoading }
               {/* Product Name - Full Width */}
               <div className="md:col-span-2">
                 <label className={styles.label + " mb-2 block"}>Product Name</label>
-                <input 
+                <input
                   required
-                  type="text" 
+                  type="text"
                   placeholder="e.g. Special Fried Rice"
                   className={styles.input}
                   value={formData.name}
@@ -211,7 +215,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, onCancel, isLoading }
               {/* Category */}
               <div>
                 <label className={styles.label + " mb-2 block"}>Category</label>
-                <select 
+                <select
                   className={styles.input + " appearance-none cursor-pointer"}
                   value={formData.category}
                   onChange={e => setFormData(p => ({...p, category: e.target.value as Category}))}
@@ -225,8 +229,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, onCancel, isLoading }
               {/* Current Stock */}
               <div>
                 <label className={styles.label + " mb-2 block"}>Current Stock</label>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   placeholder="0"
                   className={styles.input}
                   value={formData.stock || ''}
@@ -239,9 +243,9 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, onCancel, isLoading }
                 <label className={styles.label + " mb-2 block"}>Price</label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm">Rp</span>
-                  <input 
+                  <input
                     required
-                    type="number" 
+                    type="number"
                     placeholder="0"
                     className={styles.input + " pl-10"}
                     value={formData.price || ''}
@@ -253,9 +257,9 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, onCancel, isLoading }
               {/* SKU / Code */}
               <div>
                 <label className={styles.label + " mb-2 block"}>SKU / Code</label>
-                <input 
+                <input
                   required
-                  type="text" 
+                  type="text"
                   placeholder="e.g. FD-001"
                   className={styles.input}
                   value={formData.id}
@@ -266,7 +270,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, onCancel, isLoading }
               {/* Description - Full Width */}
               <div className="md:col-span-2">
                 <label className={styles.label + " mb-2 block"}>Description</label>
-                <textarea 
+                <textarea
                   rows={4}
                   className={styles.input + " resize-none"}
                   placeholder="Describe the product taste, ingredients, etc."
@@ -279,14 +283,14 @@ const ProductForm: React.FC<ProductFormProps> = ({ onSave, onCancel, isLoading }
 
           {/* Action Buttons */}
           <div className="flex gap-4">
-            <button 
+            <button
               type="button"
               onClick={onCancel}
               className={`${styles.button.base} ${styles.button.outline} flex-1 py-4`}
             >
               Cancel
             </button>
-            <button 
+            <button
               type="submit"
               disabled={isLoading}
               className={`${styles.button.base} ${styles.button.primary} flex-1 py-4 bg-emerald-600 hover:bg-emerald-700`}

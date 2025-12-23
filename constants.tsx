@@ -2,7 +2,7 @@
 import { MenuItem } from './types';
 
 // Replace with your Google Apps Script URL after deployment
-export const API_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxU5bTubMimO1WSwxIK3gO_Q5qboiMVobYOz7vbvFBbenzwUhxKZBW2litM8ZbqzZLO/exec';
+export const API_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxRCPRFcygnamXKSBNR6nc9w9P_rchGLrl9vZwCoWpA8pKoly0f1eJp8vZNBb9XRsoTeQ/exec';
 
 export const INITIAL_MENU: MenuItem[] = [
   {
